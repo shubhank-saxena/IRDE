@@ -1,0 +1,64 @@
+{% extends "dashboard.html" %}
+
+{% block main %}
+	{% if request.method=="GET" %}
+		<div align="center">
+			<div class="col-lg-8 col-md-7">
+				<div class="card">
+					<div class="header">
+						<h4 class="title">Search Item</h4>
+					</div>
+					<div class="content">
+						<form action="" method="post" accept-charset="utf-8">
+							<div class="row">
+								<div class="col-md-12">
+									<div class="form-group">
+											<input class="form-control border-input" name="no" placeholder="Item No" type="text">
+									</div>
+								</div>
+							</div>
+							<div class="text-center">
+								<button type="submit" class="btn btn-info btn-fill btn-wd">Submit</button>
+							</div>
+							<div class="clearfix"></div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	{% else %}
+		{% if items %}
+			
+			<h5>Searching for : {{no}}</h5>
+			<div align="center">
+				<table class="table table-hover" align="center">
+					<tr>
+						<th style="text-align:center">Item No</th>
+						<th style="text-align:center">Description</th>
+						<th style="text-align:center">Quantity Available</th>
+						<th style="text-align:center">Rate</th>
+					</tr>
+					{% for item in items %}
+						<tr>
+							<td align="center">{{item[0]}}</td>
+							<td align="center">{{item[1]}}</td>
+							<td align="center">{{item[2]}}</td>
+							<td align="center">{{item[3]}}</td>
+						</tr>
+					{% endfor %}
+
+				</table>
+			</div>
+		{% endif %}
+		<div class="text-center">
+			<a href="{{ url_for('searchitem') }}"> <button class="btn btn-info btn-fill btn-wd">Check Another Item</button></a>
+		</div>
+	{% endif %}
+{% endblock %}
+
+
+
+
+
+
+
