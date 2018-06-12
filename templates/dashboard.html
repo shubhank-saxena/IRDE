@@ -47,7 +47,7 @@
         		<ul class="nav">
                 <li {% if request.path == url_for('mycart') %}class="active"{% endif %}>
                     <a href="{{ url_for('mycart')}}">
-						<i class="ti-home"></i>
+						<i class="ti-bag"></i>
                         <p> My Cart</p>
                     </a>
                 </li>
@@ -85,8 +85,9 @@
 												Search Item
                                                 {% elif request.path == url_for('download') %}
                                                 All Items.
+                                                
 												{% else %}
-													Dashboard
+													Item Window
 											{% endif %}
 										</a>
                 </div>

@@ -37,6 +37,8 @@
 						<th style="text-align:center">Description</th>
 						<th style="text-align:center">Quantity Available</th>
 						<th style="text-align:center">Rate</th>
+						<th style="text-align:center"></th>
+
 					</tr>
 					{% for item in items %}
 						<tr>
@@ -44,6 +46,7 @@
 							<td align="center">{{item[1]}}</td>
 							<td align="center">{{item[2]}}</td>
 							<td align="center">{{item[3]}}</td>
+							<td align="center"><a href="{{ url_for('item',itemno=item[0]) }}" title="">Add to cart</a></td>
 						</tr>
 					{% endfor %}
 

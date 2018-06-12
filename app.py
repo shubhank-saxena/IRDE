@@ -130,9 +130,11 @@ def change():
 def mycart():
     items = query_db("select no, quantity from cart where id = %s",(session["user_id"],))
     cart = []
+    amount=0
     if items is not None:
         for item in items:
             temp = query_db("select * from warehouse where no = %s", (item[0],))
+            amount+=item[1]*temp[0][3]
             cart.extend(temp)  
     print(len(cart))
     print(items)
@@ -142,7 +144,7 @@ def mycart():
         for item in items:
             execute_db("delete from cart where id= %s and no=%s ",(session["user_id"],item[0],))
             execute_db("insert into sold values( %s ,%s,%s) ",(session["user_id"],item[0],item[1]))
-        
+        flash("Pay amount "+str(amount),"success")
         return render_template("mycart.html",items=None, user=session["user_id"],)
 
 @app.route('/searchitem', methods=["GET","POST"])
@@ -157,22 +159,23 @@ def searchitem():
         if item is None:
             flash("Item not Found", "warning")
         return render_template('searchitem.html',no=no,items=item, user=session["user_id"])
-@app.route('/searchstudent', methods=["GET","POST"])
-@login_required
-def searchstudent():
-    if request.method== 'GET':
-        return render_template('searchstudent.html', user=session["user_id"], mentor_id=session["mentor_id"])
-    else:
-        rollno = request.form['rollno']
-        students = query_db("select * from student where rollno = %s",(rollno,))
-        mentorname = ""
-        if students is not None:
-            mentor = query_db("select mentor from grp where groupid = %s", (students[0][0],))
-            mentorname = query_db("select name from mentor where id = %s", (mentor[0][0],))
-        else:
-            flash("Student Not Found", "warning")
-        return render_template("searchstudent.html",student=students, mentorname=mentorname, user=session["user_id"],mentor_id=session["mentor_id"])
 
+
+@app.route('/item/<itemno>',methods=["GET","POST"])
+@login_required
+def item(itemno=None):
+    item=query_db('select * from warehouse where no = %s', (itemno,))
+    if request.method== 'GET':
+        return render_template('item.html', user=session["user_id"],item=item)
+    else:
+        quantity = request.form['quantity']
+        print(quantity)
+        if int(quantity) > int(item[0][2]):
+            flash("Please reduce quantity","warning")
+            return render_template('item.html', user=session["user_id"],item=item)
+        execute_db("update warehouse set stock = %s where no=%s",((int(item[0][2])-int(quantity)), int(itemno),))
+        execute_db("insert into cart values(%s,%s,%s)",(session["user_id"],int(itemno),int(quantity),))
+        return redirect(url_for("mycart"))
 
 
 @app.route('/download')
