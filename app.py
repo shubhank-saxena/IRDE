@@ -154,7 +154,7 @@ def searchitem():
         return render_template('searchitem.html', user=session["user_id"])
     else:
         no = request.form['no']
-        item = query_db("select * from warehouse where no = %s", (no,))
+        item = query_db("select * from warehouse where description like %s", ("%"+keyword+"%",))
         print(item)
         if item is None:
             flash("Item not Found", "warning")
