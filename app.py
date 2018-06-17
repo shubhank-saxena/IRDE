@@ -6,6 +6,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from functools import wraps
 import csv
+from datetime import datetime
 
 
 app = Flask(__name__, static_url_path="", static_folder="static")
@@ -40,9 +41,13 @@ def login_required(f):
             return redirect(url_for("login", next=request.url))
         return f(*args, **kwargs)
     return decorated_function
-
+def emptycart():
+    execute_db("delete from cart")
 @app.route('/login', methods=['POST','GET'])
 def login():
+    now = datetime.now().strftime("%H")
+    if now=="17":
+        emptycart()
     session.clear()
     if request.method== 'GET':
         return render_template('login.html')
@@ -69,6 +74,9 @@ def logout():
 
 @app.route('/signup',methods=['POST','GET'])
 def signup():
+    now = datetime.now().strftime("%H")
+    if now=="17":
+        emptycart()
     if request.method== 'GET':
         return render_template('signup.html')
     else:
@@ -94,6 +102,9 @@ def signup():
 @app.route("/change", methods=["GET", "POST"])
 @login_required
 def change():
+    now = datetime.now().strftime("%H")
+    if now=="17":
+        emptycart()
     if request.method == "POST":
 
         # query database for user
@@ -128,6 +139,9 @@ def change():
 @app.route('/', methods=["GET","POST"])
 @login_required
 def mycart():
+    now = datetime.now().strftime("%H")
+    if now=="17":
+        emptycart()
     items = query_db("select no, quantity from cart where id = %s",(session["user_id"],))
     cart = []
     amount=0
@@ -150,20 +164,26 @@ def mycart():
 @app.route('/searchitem', methods=["GET","POST"])
 @login_required
 def searchitem():
+    now = datetime.now().strftime("%H")
+    if now=="17":
+        emptycart()
     if request.method== 'GET':
         return render_template('searchitem.html', user=session["user_id"])
     else:
-        no = request.form['no']
+        keyword = request.form['keyword']
         item = query_db("select * from warehouse where description like %s", ("%"+keyword+"%",))
         print(item)
         if item is None:
             flash("Item not Found", "warning")
-        return render_template('searchitem.html',no=no,items=item, user=session["user_id"])
+        return render_template('searchitem.html',no=keyword,items=item, user=session["user_id"])
 
 
 @app.route('/item/<itemno>',methods=["GET","POST"])
 @login_required
 def item(itemno=None):
+    now = datetime.now().strftime("%H")
+    if now=="17":
+        emptycart()
     item=query_db('select * from warehouse where no = %s', (itemno,))
     if request.method== 'GET':
         return render_template('item.html', user=session["user_id"],item=item)
